@@ -1,0 +1,35 @@
+{
+  "name": "dora-redux",
+  "version": "0.0.1",
+  "description": "Modularize redux",
+  "keywords": [],
+  "main": "dist/dora-redux.umd.js",
+  "files": [
+    "dist"
+  ],
+  "author": "awaw0618@outlook.com",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=6.0.0"
+  },
+  "scripts": {
+    "build": "cross-env NODE_ENV=production rollup -c",
+    "dev": "cross-env NODE_ENV=development rollup -c -w"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-react-app": "^3.1.1",
+    "cross-env": "^5.1.5",
+    "rollup": "^0.59.1",
+    "rollup-plugin-babel": "^3.0.4",
+    "rollup-watch": "^4.3.1"
+  },
+  "peerDependencies": {
+  }
+}
