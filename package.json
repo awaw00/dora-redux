@@ -1,7 +1,7 @@
 {
   "name": "dora-redux",
   "version": "0.0.1",
-  "description": "Modularize redux",
+  "description": "Modularized redux",
   "keywords": [],
   "main": "dist/dora-redux.umd.js",
   "files": [
