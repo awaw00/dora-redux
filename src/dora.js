@@ -12,17 +12,21 @@ export default class Dora {
     }));
   }
 
-  static loadReducers (doraList) {
-    for (dora of doraList) {
-      if (dora.rootReducer) {
-        Dora.store.keyMapReducer[dora.reducerKey] = dora.rootReducer;
-      }
-    }
-
-    Dora.replaceReducers();
+  static init (doraConfig) {
+    Dora.store = doraConfig.store;
+    Dora.combineReducers = doraConfig.combineReducers;
+    Dora.initialized = true;
   }
 
+  static reset () {
+    Dora.store = null;
+    Dora.combineReducers = null;
+    Dora.initialized = false;
+  }
+
+
   key = '';
+  config;
   rootReducer;
 
   _store = null;
@@ -39,24 +43,18 @@ export default class Dora {
     this._store = store;
   }
 
-  static init (doraConfig) {
-    Dora.store = doraConfig.store;
-    Dora.combineReducers = doraConfig.combineReducers;
-    Dora.initialized = true;
-  }
-
-  static reset () {
-    Dora.store = null;
-    Dora.combineReducers = null;
-    Dora.initialized = false;
-  }
-
   constructor (config) {
     if (!config || typeof config.key !== 'string' || config.key.length === 0) {
       throw new Error('invalid config, config.key should be string with length larger than 0');
     }
+    this.config = config;
     this.key = config.key;
     this.processDecoratedMethods();
+
+    if (this.rootReducer) {
+      console.log('load reducer', this.rootReducer);
+      this.loadReducer();
+    }
   }
 
   loadReducer () {
@@ -76,9 +74,11 @@ export default class Dora {
 
   getState (keyPath, defaultValue) {
     const stateTree = this.store.getState();
-    let state = stateTree[this.reducerKey];
+    let state;
     if (typeof stateTree.get === 'function') {
       state = stateTree.get(this.reducerKey);
+    } else {
+      state = stateTree[this.reducerKey];
     }
 
     if (keyPath !== void 0) {
@@ -86,11 +86,15 @@ export default class Dora {
         keyPath = [keyPath];
       }
 
-      for (const key of keyPath) {
-        state = state[key];
-        if (state === void 0) {
-          state = defaultValue;
-          break;
+      if (typeof state.getIn === 'function') {
+        state = state.getIn(keyPath, defaultValue);
+      } else {
+        for (const key of keyPath) {
+          state = state[key];
+          if (state === void 0) {
+            state = defaultValue;
+            break;
+          }
         }
       }
     }
@@ -156,10 +160,8 @@ export default class Dora {
       }
 
       // setTimeout(() => {
-        sagaEntries.forEach(i => this.store.runSaga(i));
+      sagaEntries.forEach(i => this.store.runSaga(i));
       // });
     }
-
-    console.log('process end');
   }
 }
