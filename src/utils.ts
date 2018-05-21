@@ -1,4 +1,4 @@
-let randomTextDict = [];
+let randomTextDict: string[] = [];
 for (let i = 65; i <= 122; i++) {
   if (i === 91) {
     i = 97;
@@ -10,7 +10,7 @@ for (let i = 65; i <= 122; i++) {
 export function getRandomChar () {
   return randomTextDict[Math.round(Math.random() * (randomTextDict.length - 1))];
 }
-export function getRandomText (length) {
+export function getRandomText (length: number) {
   let textArr = [];
   for (let i = 0; i < length; i++) {
     textArr.push(getRandomChar());
@@ -19,7 +19,7 @@ export function getRandomText (length) {
   return textArr.join('');
 }
 
-export function getAsyncType (baseType, namespace, key) {
+export function getAsyncType (baseType: string, namespace: string, key?: string) {
   const slicer = '/';
 
   if (namespace) {
@@ -35,8 +35,8 @@ export function getAsyncType (baseType, namespace, key) {
   };
 }
 
-export function getClassMembersDescriptor (prototype) {
-  let res = [];
+export function getClassMembersDescriptor (prototype: any) {
+  let res: {name: string, descriptor: PropertyDescriptor}[] = [];
   while (true) {
     const arr = Object.getOwnPropertyNames(prototype);
     res = res.concat(arr.map(i => ({

@@ -1,9 +1,19 @@
+import { bind } from './decorators';
 import { getClassMembersDescriptor } from './utils';
+
+import {
+  ReduxStore,
+  DoraStaticConfig,
+  Reducer,
+  CombineReducers,
+  Action,
+  DoraConfig
+} from './types';
 
 export default class Dora {
   static initialized = false;
-  static store = null;
-  static combineReducers = null;
+  static store: ReduxStore = null;
+  static combineReducers: CombineReducers = null;
 
   static replaceReducers () {
     const store = Dora.store;
@@ -12,7 +22,7 @@ export default class Dora {
     }));
   }
 
-  static init (doraConfig) {
+  static init (doraConfig: DoraStaticConfig) {
     Dora.store = doraConfig.store;
     Dora.combineReducers = doraConfig.combineReducers;
     Dora.initialized = true;
@@ -26,10 +36,10 @@ export default class Dora {
 
 
   key = '';
-  config;
-  rootReducer;
+  config: DoraConfig;
+  rootReducer: Reducer;
 
-  _store = null;
+  _store: ReduxStore = null;
 
   get reducerKey () {
     return this.constructor.name + '_' + this.key;
@@ -43,7 +53,7 @@ export default class Dora {
     this._store = store;
   }
 
-  constructor (config) {
+  constructor (config: DoraConfig) {
     if (!config || typeof config.key !== 'string' || config.key.length === 0) {
       throw new Error('invalid config, config.key should be string with length larger than 0');
     }
@@ -52,9 +62,13 @@ export default class Dora {
     this.processDecoratedMethods();
 
     if (this.rootReducer) {
-      console.log('load reducer', this.rootReducer);
       this.loadReducer();
     }
+
+    this.loadReducer = this.loadReducer.bind(this);
+    this.unloadReducer = this.unloadReducer.bind(this);
+    this.dispatch = this.dispatch.bind(this);
+    this.getState = this.getState.bind(this);
   }
 
   loadReducer () {
@@ -72,7 +86,7 @@ export default class Dora {
     Dora.replaceReducers();
   }
 
-  getState (keyPath, defaultValue) {
+  getState (keyPath: string | (string | number)[], defaultValue: any) {
     const stateTree = this.store.getState();
     let state;
     if (typeof stateTree.get === 'function') {
@@ -101,7 +115,7 @@ export default class Dora {
     return state;
   }
 
-  dispatch (action) {
+  dispatch (action: Action) {
     return this.store.dispatch(action);
   }
 
@@ -110,8 +124,8 @@ export default class Dora {
     const membersDescriptor = getClassMembersDescriptor(prototype);
 
     let nameMapReducer = {};
-    let rootReducer;
-    const sagaEntries = [];
+    let rootReducer: Reducer;
+    const sagaEntries: any[] = [];
     membersDescriptor.forEach(i => {
       const {name, descriptor} = i;
       if (!descriptor || typeof descriptor.value !== 'function') {
@@ -159,9 +173,7 @@ export default class Dora {
         throw new Error('store.runSaga is not a function');
       }
 
-      // setTimeout(() => {
       sagaEntries.forEach(i => this.store.runSaga(i));
-      // });
     }
   }
 }
