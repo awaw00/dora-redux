@@ -7,13 +7,18 @@ import {
   Reducer,
   CombineReducers,
   Action,
-  DoraConfig
+  DoraConfig,
+  HttpClient
 } from './types';
 
 export default class Dora {
   static initialized = false;
   static store: ReduxStore = null;
   static combineReducers: CombineReducers = null;
+  static _httpClient: HttpClient = null;
+  static get httpClient () {
+    return Dora._httpClient;
+  }
 
   static replaceReducers () {
     const store = Dora.store;
@@ -26,6 +31,9 @@ export default class Dora {
     Dora.store = doraConfig.store;
     Dora.combineReducers = doraConfig.combineReducers;
     Dora.initialized = true;
+    if (doraConfig.httpClient) {
+      Dora._httpClient = doraConfig.httpClient;
+    }
   }
 
   static reset () {
@@ -34,6 +42,11 @@ export default class Dora {
     Dora.initialized = false;
   }
 
+  static api<T = any> (makeApiCallFn: (http: HttpClient) => (...apiArgs: any[]) => Promise<T>) {
+    return function (...apiArgs: any[]) {
+      return makeApiCallFn(Dora.httpClient).apply(null, apiArgs) as Promise<T>;
+    };
+  }
 
   key = '';
   config: DoraConfig;

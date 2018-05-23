@@ -22,9 +22,17 @@ export interface CombineReducers {
   (keyMapReducer: KeyMapReducer): Reducer;
 }
 
+export interface HttpClient {
+  get: (...args: any[]) => Promise<any>;
+  post: (...args: any[]) => Promise<any>;
+  put: (...args: any[]) => Promise<any>;
+  delete: (...args: any[]) => Promise<any>;
+}
+
 export interface DoraStaticConfig {
   store: ReduxStore;
   combineReducers: CombineReducers;
+  httpClient?: HttpClient;
 }
 
 export interface DoraConfig {
