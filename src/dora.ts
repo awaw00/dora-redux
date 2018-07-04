@@ -15,6 +15,7 @@ export default class Dora {
   static initialized = false;
   static store: ReduxStore = null;
   static combineReducers: CombineReducers = null;
+  static replaceReducer: (reducer: Reducer) => any;
   static _httpClient: HttpClient = null;
   static get httpClient () {
     return Dora._httpClient;
@@ -22,7 +23,7 @@ export default class Dora {
 
   static replaceReducers () {
     const store = Dora.store;
-    store.replaceReducer(Dora.combineReducers({
+    Dora.replaceReducer(Dora.combineReducers({
       ...store.keyMapReducer
     }));
   }
@@ -31,6 +32,11 @@ export default class Dora {
     Dora.store = doraConfig.store;
     Dora.combineReducers = doraConfig.combineReducers;
     Dora.initialized = true;
+    if (doraConfig.replaceReducer) {
+      Dora.replaceReducer = doraConfig.replaceReducer;
+    } else {
+      Dora.replaceReducer = Dora.store.replaceReducer;
+    }
     if (doraConfig.httpClient) {
       Dora._httpClient = doraConfig.httpClient;
     }

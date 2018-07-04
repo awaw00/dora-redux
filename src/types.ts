@@ -32,6 +32,7 @@ export interface HttpClient {
 export interface DoraStaticConfig {
   store: ReduxStore;
   combineReducers: CombineReducers;
+  replaceReducer?: (reducer: Reducer) => any;
   httpClient?: HttpClient;
 }
 

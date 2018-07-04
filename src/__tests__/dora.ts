@@ -5,7 +5,8 @@ const store = {
   getState: () => {},
   replaceReducer: (reducer: any) => {},
   subscribe: () => {},
-  keyMapReducer: {}
+  keyMapReducer: {},
+  runSaga: (saga: any) => ({})
 };
 
 function combineReducers (reducers: any) {
@@ -30,4 +31,8 @@ it('define api before Dora.init', function () {
   return api().then(http => {
     expect(http).toBe(httpClient);
   });
+});
+
+it('runSaga after initialized', function () {
+
 });
